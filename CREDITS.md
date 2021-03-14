@@ -1,0 +1,1 @@
+- FavoredSoul and Vyxenne for [Ultimate Assortment](https://www.nexusmods.com/skyrim/mods/15927)
