@@ -1,4 +1,3 @@
-"""Build the Oldrim release archive."""
 import config
 import os
 import logging
@@ -56,6 +55,45 @@ def build_oldrim_cbbe(release_name: str, version: str):
         release.make_archive(release_name, version, dir_temp, dir_release)
 
 
+def build_sse_unp(release_name: str, version: str):
+    with tempfile.TemporaryDirectory() as dir_temp:
+        src = os.path.join(config.DIR_REPO, "Meshes - SSE")
+        dst = os.path.join(dir_temp, "Meshes")
+        shutil.copytree(src, dst)
+        src = os.path.join(config.DIR_REPO, "Textures")
+        dst = os.path.join(dir_temp, "Textures")
+        shutil.copytree(src, dst)
+        dir_plugin = os.path.join(config.DIR_REPO, "Plugin - SSE")
+        bsa_name = release.find_bsa_name(dir_plugin)
+        src = dir_temp
+        dst = os.path.join(dir_temp, bsa_name)
+        release.build_bsa(src, dst, config.BSARCH, "sse", True)
+        copy_and_check_plugins(dir_plugin, dir_temp, version)
+        dir_release = os.path.join(config.DIR_REPO, "Releases", "SSE")
+        release.make_archive(release_name, version, dir_temp, dir_release)
+
+
+def build_sse_cbbe(release_name: str, version: str):
+    with tempfile.TemporaryDirectory() as dir_temp:
+        src = os.path.join(config.DIR_REPO, "Meshes - SSE")
+        dst = os.path.join(dir_temp, "Meshes")
+        shutil.copytree(src, dst)
+        src = os.path.join(config.DIR_REPO, "Meshes - SSE CBBE")
+        dst = os.path.join(dir_temp, "Meshes")
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+        src = os.path.join(config.DIR_REPO, "Textures")
+        dst = os.path.join(dir_temp, "Textures")
+        shutil.copytree(src, dst)
+        dir_plugin = os.path.join(config.DIR_REPO, "Plugin - SSE")
+        bsa_name = release.find_bsa_name(dir_plugin)
+        src = dir_temp
+        dst = os.path.join(dir_temp, bsa_name)
+        release.build_bsa(src, dst, config.BSARCH, "sse", True)
+        copy_and_check_plugins(dir_plugin, dir_temp, version)
+        dir_release = os.path.join(config.DIR_REPO, "Releases", "SSE")
+        release.make_archive(release_name, version, dir_temp, dir_release)
+
+
 logger = logging.getLogger(release.__name__)
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
@@ -65,5 +103,7 @@ logger.addHandler(handler)
 try:
     build_oldrim_unp("{} UNP".format(config.MOD_NAME), config.MOD_VERSION)
     build_oldrim_cbbe("{} CBBE".format(config.MOD_NAME), config.MOD_VERSION)
+    build_sse_unp("{} UNP".format(config.MOD_NAME), config.MOD_VERSION)
+    build_sse_cbbe("{} CBBE".format(config.MOD_NAME), config.MOD_VERSION)
 except Exception as error:
     logger.exception(error)
